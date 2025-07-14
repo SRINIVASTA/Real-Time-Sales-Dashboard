@@ -46,7 +46,7 @@ df = st.session_state.sales_data
 total_sales_units = df['quantity'].sum()
 total_revenue = df['revenue'].sum()
 
-# === THIS IS THE CORRECT LOGIC FOR "TOP PERFORMING PRODUCT" ===
+# === LOGIC FOR "TOP PERFORMING PRODUCT" ===
 try:
     if not df.empty:
         # Step 1: Group by product and sum their revenue.
@@ -69,7 +69,7 @@ kpi1, kpi2, kpi3 = st.columns(3)
 kpi1.metric(label="Total Sales (Units) 📦", value=int(total_sales_units))
 kpi2.metric(label="Total Revenue 💵", value=f"${total_revenue:,.2f}")
 
-# This metric now displays the correct product name calculated above.
+# This metric displays the correct product name calculated above.
 kpi3.metric(label="Top Performing Product 🔥", value=top_product)
 
 st.markdown("---")
@@ -90,4 +90,8 @@ st.dataframe(
 
 # --- 7. AUTO-REFRESH SCRIPT ---
 time.sleep(2)
-st.experimental_rerun()
+
+# === THIS IS THE FIX ===
+# Replace the old, deprecated command with the current one.
+st.rerun()
+# ======================

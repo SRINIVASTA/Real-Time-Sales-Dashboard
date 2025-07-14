@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # --- DATA SIMULATION ---
-# Function to generate a new sales record with more realistic product names
+# Function to generate a new sales record with realistic product names
 def generate_sales_data():
     products = {
         "Quantum Laptop": 1499.99,
@@ -35,7 +35,29 @@ if 'sales_data' not in st.session_state:
     st.session_state.sales_data = pd.DataFrame(columns=["product", "quantity", "revenue", "timestamp"])
 
 # --- DASHBOARD LAYOUT ---
+# Custom CSS for the blinking "Live" indicator
+st.markdown("""
+<style>
+.blinking-dot {
+    height: 10px;
+    width: 10px;
+    background-color: #00ff00; /* Green dot */
+    border-radius: 50%;
+    display: inline-block;
+    animation: blinking 1s infinite;
+    margin-right: 5px;
+}
+@keyframes blinking {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+</style>
+""", unsafe_allow_html=True)
+
 st.title("📈 Real-Time Sales Dashboard")
+st.markdown('<h3><span class="blinking-dot"></span>Live</h3>', unsafe_allow_html=True)
+
 
 # Create a placeholder for the entire dashboard
 placeholder = st.empty()
@@ -54,28 +76,27 @@ while True:
     with placeholder.container():
         # --- KEY METRICS ---
         df = st.session_state.sales_data
-        total_revenue = df['revenue'].sum()
-        total_sales_units = df['quantity'].sum()
-        
+
         # Calculate top performing product by revenue
         if not df.empty:
             top_product = df.groupby('product')['revenue'].sum().idxmax()
         else:
-            top_product = "N/A"
+            top_product = "N/A" # Handle case for empty dataframe at the start
 
-        # Display KPIs in a 3-column layout (Order updated as per request)
+        # Display KPIs in a 3-column layout
         kpi1, kpi2, kpi3 = st.columns(3)
         kpi1.metric(
             label="Total Revenue 💵",
-            value=f"${total_revenue:,.2f}",
+            value=f"${df['revenue'].sum():,.2f}",
         )
+        # THIS IS THE METRIC YOU REQUESTED
         kpi2.metric(
             label="Top Performing Product 🔥",
             value=top_product,
         )
         kpi3.metric(
             label="Total Sales (Units) 📦",
-            value=f"{total_sales_units}",
+            value=f"{df['quantity'].sum()}",
         )
 
         st.markdown("---") # Visual separator
@@ -111,7 +132,7 @@ while True:
                 text='revenue'
             )
             fig_product.update_traces(texttemplate='$%{text:,.2f}', textposition='outside')
-            fig_product.update_layout(height=400)
+            fig_product.update_layout(height=400, yaxis={'categoryorder':'total ascending'})
             st.plotly_chart(fig_product, use_container_width=True)
             
         st.markdown("---")

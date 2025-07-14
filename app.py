@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import time
+import plotly.express as px
 
 # --- 1. PAGE CONFIGURATION ---
 st.set_page_config(
@@ -49,9 +50,7 @@ total_revenue = df['revenue'].sum()
 # === LOGIC FOR "TOP PERFORMING PRODUCT" ===
 try:
     if not df.empty:
-        # Step 1: Group by product and sum their revenue.
         revenue_by_product = df.groupby('product')['revenue'].sum()
-        # Step 2: Use idxmax() to get the NAME of the product with the highest revenue.
         top_product = revenue_by_product.idxmax()
     else:
         top_product = "N/A"
@@ -68,9 +67,42 @@ kpi1, kpi2, kpi3 = st.columns(3)
 # Fill each KPI with its value.
 kpi1.metric(label="Total Sales (Units) 📦", value=int(total_sales_units))
 kpi2.metric(label="Total Revenue 💵", value=f"${total_revenue:,.2f}")
-
-# This metric displays the correct product name calculated above.
 kpi3.metric(label="Top Performing Product 🔥", value=top_product)
+
+st.markdown("---")
+
+# === GRAPH SECTION ===
+st.subheader("Visualizations")
+fig_col1, fig_col2 = st.columns(2)
+
+with fig_col1:
+    # REVENUE OVER TIME (LINE CHART)
+    st.markdown("##### Revenue Over Time")
+    # Create a copy to add a cumulative sum column for visualization
+    df_viz = df.copy()
+    df_viz['cumulative_revenue'] = df_viz['revenue'].cumsum()
+    fig = px.line(
+        df_viz,
+        x="timestamp",
+        y="cumulative_revenue",
+        labels={"cumulative_revenue": "Cumulative Revenue"}
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+with fig_col2:
+    # PRODUCT PERFORMANCE (BAR CHART)
+    st.markdown("##### Product Performance (Top 5)")
+    product_performance = df.groupby('product')['revenue'].sum().nlargest(5).reset_index()
+    fig2 = px.bar(
+        product_performance,
+        x="revenue",
+        y="product",
+        orientation="h",
+        labels={"revenue": "Total Revenue", "product": "Product"}
+    )
+    fig2.update_layout(yaxis={'categoryorder':'total ascending'})
+    st.plotly_chart(fig2, use_container_width=True)
+# ======================
 
 st.markdown("---")
 
@@ -90,8 +122,4 @@ st.dataframe(
 
 # --- 7. AUTO-REFRESH SCRIPT ---
 time.sleep(2)
-
-# === THIS IS THE FIX ===
-# Replace the old, deprecated command with the current one.
 st.rerun()
-# ======================

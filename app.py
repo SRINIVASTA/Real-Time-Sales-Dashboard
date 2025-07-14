@@ -76,29 +76,28 @@ while True:
     with placeholder.container():
         # --- KEY METRICS ---
         df = st.session_state.sales_data
-
+        
         # Calculate top performing product by revenue
         if not df.empty:
             top_product = df.groupby('product')['revenue'].sum().idxmax()
         else:
             top_product = "N/A" # Handle case for empty dataframe at the start
 
-        # Display KPIs in a 3-column layout
+        # Display KPIs in a 3-column layout as requested
         kpi1, kpi2, kpi3 = st.columns(3)
         kpi1.metric(
-            label="Total Revenue 💵",
-            value=f"${df['revenue'].sum():,.2f}",
-        )
-        # THIS IS THE METRIC YOU REQUESTED
-        kpi2.metric(
-            label="Top Performing Product 🔥",
-            value=top_product,
-        )
-        kpi3.metric(
             label="Total Sales (Units) 📦",
             value=f"{df['quantity'].sum()}",
         )
-
+        kpi2.metric(
+            label="Total Revenue 💵",
+            value=f"${df['revenue'].sum():,.2f}",
+        )
+        kpi3.metric(
+            label="Top Performing Product 🔥",
+            value=top_product,
+        )
+        
         st.markdown("---") # Visual separator
 
         # --- VISUALIZATIONS ---

@@ -63,19 +63,19 @@ while True:
         else:
             top_product = "N/A"
 
-        # Display KPIs in a 3-column layout
+        # Display KPIs in a 3-column layout (Order updated as per request)
         kpi1, kpi2, kpi3 = st.columns(3)
         kpi1.metric(
             label="Total Revenue 💵",
             value=f"${total_revenue:,.2f}",
         )
         kpi2.metric(
-            label="Total Sales (Units) 📦",
-            value=f"{total_sales_units}",
-        )
-        kpi3.metric(
             label="Top Performing Product 🔥",
             value=top_product,
+        )
+        kpi3.metric(
+            label="Total Sales (Units) 📦",
+            value=f"{total_sales_units}",
         )
 
         st.markdown("---") # Visual separator
